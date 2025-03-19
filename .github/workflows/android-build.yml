@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main  # Se ejecutará cuando hagas push a la rama "main"
+
+  workflow_dispatch:  # Permite ejecutarlo manualmente desde Actions
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Configurar JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Gradle Cache
+        uses: gradle/gradle-build-action@v2
+
+      - name: Compilar APK
+        run: |
+          cd app
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Guardar el APK generado
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk
+          path: app/build/outputs/apk/debug/app-debug.apk
